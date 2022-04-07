@@ -19,6 +19,9 @@ export class EmployeeService {
     public async getEmployeeById(employeeId: string) {
         return this.employeeRepository.getEmployeeById(employeeId);
     }
+    public async getEmployeeByIdWithAddress(employeeId: string) {
+      return this.employeeRepository.getEmployeeByIdWithAddress(employeeId);
+  }
 
     public async createEmployee(employeeDetails: any) {
         try {
@@ -30,6 +33,7 @@ export class EmployeeService {
                 departmentId: employeeDetails.departmentId,
                 isActive: true,
                 roleId: employeeDetails.role_id,
+                addressId:employeeDetails.address_id
             });
             const save = await this.employeeRepository.saveEmployeeDetails(newEmployee);
             delete save.password
@@ -71,10 +75,8 @@ export class EmployeeService {
         username: string,
         password: string
       ) => {
-        // const employeeDetails = await this.employeeRepository.getEmployeeByUsername(
-        //   username
-        // );
-        const employeeDetails = await this.employeeRepository.getEmployeeByUsername(
+
+        const employeeDetails = await this.employeeRepository.getEmployeeByUsernameWithRole(
           username
         );
         if (!employeeDetails) {
@@ -87,7 +89,7 @@ export class EmployeeService {
           let payload = {
             "custom:id": employeeDetails.id,
             "custom:email": employeeDetails.username,
-            "custom:role":"admin"
+            "customRole":"admin"
           };
           console.log(payload)
                     const token = this.generateAuthTokens(payload);

@@ -11,7 +11,7 @@ export class Role extends AbstractEntity {
     public salary:number;
     @Column({nullable : true})
     public description :string;
-    @ManyToMany((type) => Employee, (employee) => employee.role)
+    @ManyToOne((type) => Employee, (employee) => employee.role)
     @JoinColumn()
     public employee: Employee[];
 }

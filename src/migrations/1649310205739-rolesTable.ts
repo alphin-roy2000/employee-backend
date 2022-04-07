@@ -1,17 +1,17 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class rolesTable1649282149924 implements MigrationInterface {
-    name = 'rolesTable1649282149924'
+export class rolesTable1649310205739 implements MigrationInterface {
+    name = 'rolesTable1649310205739'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "departmentDetails" ("created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "department_room" character varying NOT NULL, "department_code" character varying, "website" character varying, CONSTRAINT "PK_1a19be3ec7fe32e887e665e5806" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "role" ("created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "role" character varying NOT NULL, "salary" integer NOT NULL, "description" character varying, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "employee" ("created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "username" character varying NOT NULL, "password" character varying, "age" integer NOT NULL, "is_active" boolean NOT NULL DEFAULT true, "department_id" integer NOT NULL, "role_id" uuid NOT NULL, CONSTRAINT "UQ_389fe2fe09430efb8eabc4e1b6e" UNIQUE ("username"), CONSTRAINT "PK_3c2bc72f03fd5abbbc5ac169498" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "department" ("created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "id" SERIAL NOT NULL, "name" character varying NOT NULL, "department_details_id" uuid, CONSTRAINT "REL_cd33326ed8c9f0d2ce5b39dd66" UNIQUE ("department_details_id"), CONSTRAINT "PK_9a2213262c1593bffb581e382f5" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "role" ("created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "role" character varying NOT NULL, "salary" integer NOT NULL, "description" character varying, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "employee" ("created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "username" character varying NOT NULL, "password" character varying, "age" integer NOT NULL, "is_active" boolean NOT NULL DEFAULT true, "department_id" integer NOT NULL, "role_id" uuid, CONSTRAINT "UQ_389fe2fe09430efb8eabc4e1b6e" UNIQUE ("username"), CONSTRAINT "PK_3c2bc72f03fd5abbbc5ac169498" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "project" ("created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "project_id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "is_active" character varying NOT NULL, CONSTRAINT "PK_1a480c5734c5aacb9cef7b1499d" PRIMARY KEY ("project_id"))`);
+        await queryRunner.query(`ALTER TABLE "department" ADD CONSTRAINT "FK_cd33326ed8c9f0d2ce5b39dd662" FOREIGN KEY ("department_details_id") REFERENCES "departmentDetails"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "employee" ADD CONSTRAINT "FK_d62835db8c0aec1d18a5a927549" FOREIGN KEY ("department_id") REFERENCES "department"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "employee" ADD CONSTRAINT "FK_1c105b756816efbdeae09a9ab65" FOREIGN KEY ("role_id") REFERENCES "role"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "department" ADD CONSTRAINT "FK_cd33326ed8c9f0d2ce5b39dd662" FOREIGN KEY ("department_details_id") REFERENCES "departmentDetails"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`INSERT INTO public."departmentDetails"
         (created_at, updated_at, deleted_at, id, department_room, department_code, website)
         VALUES(now(), now(), NULL, 'e3a48e3f-febd-4a67-a9af-29e141afb59b', 'D101', 'PE', '')`);
@@ -33,13 +33,13 @@ export class rolesTable1649282149924 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "department" DROP CONSTRAINT "FK_cd33326ed8c9f0d2ce5b39dd662"`);
         await queryRunner.query(`ALTER TABLE "employee" DROP CONSTRAINT "FK_1c105b756816efbdeae09a9ab65"`);
         await queryRunner.query(`ALTER TABLE "employee" DROP CONSTRAINT "FK_d62835db8c0aec1d18a5a927549"`);
+        await queryRunner.query(`ALTER TABLE "department" DROP CONSTRAINT "FK_cd33326ed8c9f0d2ce5b39dd662"`);
         await queryRunner.query(`DROP TABLE "project"`);
-        await queryRunner.query(`DROP TABLE "department"`);
         await queryRunner.query(`DROP TABLE "employee"`);
         await queryRunner.query(`DROP TABLE "role"`);
+        await queryRunner.query(`DROP TABLE "department"`);
         await queryRunner.query(`DROP TABLE "departmentDetails"`);
     }
 

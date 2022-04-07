@@ -12,6 +12,11 @@ export class EmployeeRepository extends Repository<Employee> {
         const employeeRepo = getConnection().getRepository(Employee);
         return employeeRepo.findOne(id);
     }
+    public async getEmployeeByIdWithAddress(id: string) {
+        const employeeRepo = getConnection().getRepository(Employee);
+        // console.log(id)
+        return employeeRepo.createQueryBuilder("employee").innerJoinAndSelect("employee.address","address").where({id:id}).getOne();
+    }
 
     public async getEmployeeByUsername(username: string) {
         const employeeRepo = getConnection().getRepository(Employee);
@@ -21,7 +26,8 @@ export class EmployeeRepository extends Repository<Employee> {
         return employeeDetails;
     }public async getEmployeeByUsernameWithRole(username: string) {
         const employeeRepo = getConnection().getRepository(Employee);
-        const employeeDetails=await employeeRepo.createQueryBuilder("employee").innerJoin("employee.role","role").where("").getOne()
+        const employeeDetails=await employeeRepo.createQueryBuilder("employee").innerJoinAndSelect("employee.role","roles").where({username:username}).getOne()
+        console.log(employeeDetails)
         return employeeDetails;
     }
     public async saveEmployeeDetails(employeeDetails: Employee) {

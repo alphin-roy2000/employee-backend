@@ -1,7 +1,7 @@
 import express from "express";
 import UserNotAuthorizedException from "../exception/UserNotAuthorizedException";
 import RequestWithUser from "../util/rest/request";
-import jsonwebtoken from "jsonwebtoken";
+import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 import APP_CONSTANTS from "../constants";
 const authorize = () => {
  return async (
@@ -11,9 +11,12 @@ const authorize = () => {
  ) => {
    try {
      const token = getTokenFromRequestHeader(req);
-     console.log(typeof(jsonwebtoken.decode(token)))
+     console.log("de13212421343252345")
+     const decoded = jsonwebtoken.decode(token)
+     const payLoadString = JSON.stringify(decoded);
+     console.log(JSON.parse(payLoadString).customRole);
+    //  console.log(decoded.customRole)
      jsonwebtoken.verify(token, process.env.JWT_TOKEN_SECRET);
-     console.log(jsonwebtoken.decode(token))
      return next();
    } catch (error) {
      return next(new UserNotAuthorizedException());

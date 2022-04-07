@@ -3,7 +3,9 @@ import multer from "multer";
 import APP_CONSTANTS from "../constants";
 import { CreateEmployeeDto } from "../dto/CreateEmployee";
 import authorize from "../middleware/authorize";
+import authorizeadmin from "../middleware/authorize admin";
 import validationMiddleware from "../middleware/validationMiddleware";
+import { AddressService } from "../services/AddressService";
 import { EmployeeService } from "../services/EmployeeService";
 import { AbstractController } from "../util/rest/controller";
 import RequestWithUser from "../util/rest/request";
@@ -16,6 +18,7 @@ class EmployeeController extends AbstractController {
   private upload = multer({ dest: "./public/uploads/"});
   constructor(
     private employeeService: EmployeeService,
+    private addressService: AddressService,
   ) {
     super(`${APP_CONSTANTS.apiPrefix}/employees`);
     this.initializeRoutes();
@@ -24,7 +27,7 @@ class EmployeeController extends AbstractController {
   protected initializeRoutes = (): void => {
     this.router.get(
       `${this.path}`,
-      authorize(),
+      // authorize(),
       this.asyncRouteHandler(this.getAllEmployees)
     );
     this.router.get(
@@ -33,16 +36,21 @@ class EmployeeController extends AbstractController {
     );
     this.router.post(
       `${this.path}`,
+      authorizeadmin("admin"),
+      // authorizeadmin(),
       // validationMiddleware(CreateEmployeeDto, APP_CONSTANTS.body),
       // this.asyncRouteHandler(this.createEmployee)
       this.createEmployee
     );
     this.router.put(
       `${this.path}/:employeeId`,
+      authorizeadmin("admin"),
+
       this.asyncRouteHandler(this.updateEmployee)
     );
     this.router.delete(
       `${this.path}/:employeeId`,
+      authorizeadmin("admin"),
       this.asyncRouteHandler(this.deleteEmployee)
     );
 
@@ -76,9 +84,16 @@ class EmployeeController extends AbstractController {
     response: Response,
     next: NextFunction
   ) => {
-    const data = await this.employeeService.getAllEmployees();
+    // console.log(request.params.employeeId)
+    // const data = await this.employeeService.getEmployeeById(request.params.employeeId);
+    // const saveadd = await this.addressService.getAddressById(data.addressId);
+    // let employee = {
+    //   data:data,
+    //   savedate:saveadd
+    // };
+    const employee = await this.employeeService.getAllEmployees();
     response.send(
-      this.fmt.formatResponse(data, Date.now() - request.startTime, "OK")
+      this.fmt.formatResponse(employee, Date.now() - request.startTime, "OK")
     );
   }
 
@@ -87,7 +102,7 @@ class EmployeeController extends AbstractController {
     response: Response,
     next: NextFunction
   ) => {
-    const data = await this.employeeService.getEmployeeById(request.params.id);
+    const data = await this.employeeService.getEmployeeByIdWithAddress(request.params.employeeId);
     response.send(
       this.fmt.formatResponse(data, Date.now() - request.startTime, "OK")
     );
@@ -99,7 +114,11 @@ class EmployeeController extends AbstractController {
     next: NextFunction
   ) => {
     try {
+      const add = await this.addressService.createAddress(request.body);
+      request.body["address_id"] = add.id;
+      console.log(request.body)
       const data = await this.employeeService.createEmployee(request.body);
+
       response.send(
         this.fmt.formatResponse(data, Date.now() - request.startTime, "OK")
       );

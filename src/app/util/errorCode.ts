@@ -5,6 +5,9 @@ export const ErrorCodes: { [key: string]: CustomError } = {
     UNAUTHORIZED: {
         CODE: "UNAUTHORIZED",
         MESSAGE: "User is not allowed to perform this operation",
+    },UNAUTHORIZEDADMIN: {
+        CODE: "UNAUTHORIZED ADMIN",
+        MESSAGE: "User is not allowed to perform this operation",
     },
     USER_NOT_FOUND: {
         CODE: "USER_NOT_FOUND",
